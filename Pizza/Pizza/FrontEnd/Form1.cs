@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Pizza.Presenters;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -8,12 +9,12 @@ using System.Windows.Forms;
 namespace Pizza
 {
 
-    public partial class Form1 : Form
+    public partial class Form1 : Form , IForm1ListViewDishesAndCheckedListBoxSideDish
     {
 
 
         public Form1 form1;
-
+       
 
         AddOrderFromForm1 addOrder = new AddOrderFromForm1();
         public Form1()
@@ -35,6 +36,9 @@ namespace Pizza
             SqlLite.CreateTabeles createTabeles = new SqlLite.CreateTabeles();
             createTabeles.CreateSQLiteTables();        
         }
+      
+        public ListView ListViewDishes { get => listViewDish; set => listViewDish = value; }
+        public CheckedListBox CheckedListBoxSideDish { get => chListBoxSideDishes; set => chListBoxSideDishes = value; }
 
         public enum ButtonMenu
         {
@@ -63,8 +67,7 @@ namespace Pizza
         private void PizzaButtonSettings(ButtonMenu en)
         {
             bPizza.BackColor = Color.LawnGreen;
-            VisibleSideDishe(en);
-            VisibleDenmark(en);
+            VisibleSideDishe(en);          
             ChengeNameLabelMenuInfo(en);
             SetVisibleButtonDishesOK(false);
             SetVisibleTextViewDishesQuantity(false);
@@ -73,8 +76,7 @@ namespace Pizza
         private void MainDishButtonSettings(ButtonMenu en)
         {
             bMainDish.BackColor = Color.LawnGreen;
-            VisibleSideDishe(en);
-            VisibleDenmark(en);
+            VisibleSideDishe(en);          
             ChengeNameLabelMenuInfo(en);
             SetVisibleButtonDishesOK(false);
             SetVisibleTextViewDishesQuantity(false);
@@ -83,8 +85,7 @@ namespace Pizza
         private void SoupsButtonSettings(ButtonMenu en)
         {
             bSoups.BackColor = Color.LawnGreen;
-            VisibleSideDishe(en);
-            VisibleDenmark(en);
+            VisibleSideDishe(en);          
             ChengeNameLabelMenuInfo(en);
             SetVisibleButtonDishesOK(false);
             SetVisibleTextViewDishesQuantity(false);
@@ -93,8 +94,7 @@ namespace Pizza
         private void DrinkseButtonSettings(ButtonMenu en)
         {
             bDrinks.BackColor = Color.LawnGreen;
-            VisibleSideDishe(en);
-            VisibleDenmark(en);
+            VisibleSideDishe(en);          
             ChengeNameLabelMenuInfo(en);
             SetVisibleButtonDishesOK(false);
             SetVisibleTextViewDishesQuantity(false);
@@ -116,7 +116,6 @@ namespace Pizza
                     chListBoxSideDishes.Visible = false;
                     break;
             }
-
         }
 
         private void LoadCheckListBoxSideDishe(List<string> sideDishes)
@@ -134,29 +133,24 @@ namespace Pizza
         }
 
         private List<Dish> listDisch = new List<Dish>();
-        void VisibleDenmark(ButtonMenu en)
-        {
-            ListOfDishes loadListDishes = new ListOfDishes();
+        private Form1LoadDishesPresenters loadListViewDishes;
+        private void LoadListViewDishes(ButtonMenu en)
+        {           
+            loadListViewDishes = new Form1LoadDishesPresenters(this);
 
             switch (en)
             {
-                case ButtonMenu.Pizza: listDisch = loadListDishes.LoadListPizza(); 
+                case ButtonMenu.Pizza: loadListViewDishes.LoadPizza(); 
                     break;
-                case ButtonMenu.MainDish: listDisch = loadListDishes.LoadListMainDish(); 
+                case ButtonMenu.MainDish:
+                    loadListViewDishes.LoadMainDish(); 
                     break;
-                case ButtonMenu.Soups: listDisch = loadListDishes.LoadListSoups();
+                case ButtonMenu.Soups:
+                    loadListViewDishes.LoadSoups();
                     break;
-                case ButtonMenu.Drinks:
-                    listDisch = loadListDishes.LoadListDrinks(); break;
-            }
-
-            listViewDish.Items.Clear();
-            foreach (var disch in listDisch)
-            {
-                ListViewItem lvi = new ListViewItem(Convert.ToString(disch.Name));
-                lvi.SubItems.Add(disch.Price);
-                listViewDish.Items.Add(lvi);
-            }
+                case ButtonMenu.Drinks:loadListViewDishes.LoadDrinks(); 
+                    break;
+            }         
         }
 
         private void ClearColorButton()
@@ -186,21 +180,26 @@ namespace Pizza
         private void ButtonPizza_Click(object sender, EventArgs e)
         {
             Start(ButtonMenu.Pizza);
+            LoadListViewDishes(ButtonMenu.Pizza);
         }
 
         private void ButtonMainDish_Click(object sender, EventArgs e)
         {
            Start(ButtonMenu.MainDish);
+           LoadListViewDishes(ButtonMenu.MainDish);
+
         }
 
         private void ButtonDrinks_Click(object sender, EventArgs e)
         {
            Start(ButtonMenu.Drinks);
+           LoadListViewDishes(ButtonMenu.Drinks);
         }
 
         private void ButtonSoup_Click(object sender, EventArgs e)
         {
             Start(ButtonMenu.Soups);
+            LoadListViewDishes(ButtonMenu.Soups);
         }
 
         private void LabelPrice()
@@ -380,6 +379,8 @@ namespace Pizza
 
         Save save = new Save();
 
+       
+
         private void BackgroundWorker2_DoWork(object sender, DoWorkEventArgs e)
         {
             bOrder.BackColor = Color.Firebrick;
@@ -472,9 +473,6 @@ namespace Pizza
             textViewDishes.Text = "1";
         }
 
-        private void panelDania_Paint(object sender, PaintEventArgs e)
-        {
-
-        }
+      
     }
 }

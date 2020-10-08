@@ -147,7 +147,7 @@ namespace Pizza
             this.panelDania.Name = "panelDania";
             this.panelDania.Size = new System.Drawing.Size(696, 246);
             this.panelDania.TabIndex = 35;
-            this.panelDania.Paint += new System.Windows.Forms.PaintEventHandler(this.panelDania_Paint);
+            
             // 
             // listViewDish
             // 
